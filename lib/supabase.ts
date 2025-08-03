@@ -10,7 +10,6 @@ export const supabase = createClient(supabaseUrl, supabaseKey)
 export interface ReservationData {
   id?: number
   email: string
-  phone: string
   created_at?: string
 }
 

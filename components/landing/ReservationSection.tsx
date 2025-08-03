@@ -3,16 +3,16 @@ import { saveReservation } from '../../lib/supabase';
 
 interface ReservationData {
   email: string;
-  phone: string;
 }
 
 const ReservationSection: React.FC = () => {
   const [formData, setFormData] = useState<ReservationData>({
-    email: '',
-    phone: ''
+    email: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitMessage, setSubmitMessage] = useState('');
+  const [privacyConsent, setPrivacyConsent] = useState(false);
+  const [showPrivacyDetails, setShowPrivacyDetails] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -24,17 +24,23 @@ const ReservationSection: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!privacyConsent) {
+      setSubmitMessage('개인정보 수집 이용 동의를 체크해주세요.');
+      return;
+    }
+    
     setIsSubmitting(true);
     
     try {
       // Supabase에 데이터 저장
       await saveReservation({
-        email: formData.email,
-        phone: formData.phone
+        email: formData.email
       });
       
       setSubmitMessage('예약이 완료되었습니다! 앱 출시 시 특별 혜택을 받으실 수 있습니다.');
-      setFormData({ email: '', phone: '' });
+      setFormData({ email: '' });
+      setPrivacyConsent(false);
       
       // 3초 후 메시지 삭제
       setTimeout(() => {
@@ -99,25 +105,52 @@ const ReservationSection: React.FC = () => {
                 />
               </div>
               
-              <div>
-                <label htmlFor="phone" className="block text-white text-sm font-medium mb-2">
-                  전화번호 *
-                </label>
-                <input
-                  type="tel"
-                  id="phone"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                  placeholder="010-1234-5678"
-                />
+              {/* 개인정보 수집 이용 동의 */}
+              <div className="space-y-3">
+                <div className="flex items-start gap-3">
+                  <input
+                    type="checkbox"
+                    id="privacy-consent"
+                    checked={privacyConsent}
+                    onChange={(e) => setPrivacyConsent(e.target.checked)}
+                    className="mt-1 w-5 h-5 text-primary bg-white/10 border-white/20 rounded focus:ring-primary focus:ring-2"
+                    required
+                  />
+                  <div className="flex-1">
+                    <label htmlFor="privacy-consent" className="text-white text-sm cursor-pointer">
+                      개인정보 수집 이용에 동의합니다. *
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => setShowPrivacyDetails(!showPrivacyDetails)}
+                      className="ml-2 text-primary text-sm underline hover:text-primary/80"
+                    >
+                      자세히보기
+                    </button>
+                  </div>
+                </div>
+                
+                {showPrivacyDetails && (
+                  <div className="bg-white/5 border border-white/10 rounded-lg p-4 text-sm text-gray-300">
+                    <h4 className="text-white font-medium mb-2">개인정보 수집 이용 안내</h4>
+                    <div className="space-y-2">
+                      <div>
+                        <span className="font-medium text-white">수집 항목:</span> 이메일
+                      </div>
+                      <div>
+                        <span className="font-medium text-white">수집 목적:</span> 출시 알림 및 사전 예약자 확인
+                      </div>
+                      <div>
+                        <span className="font-medium text-white">보유 기간:</span> 수집 목적 달성 후 즉시 폐기
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
 
               <button
                 type="submit"
-                disabled={isSubmitting}
+                disabled={isSubmitting || !privacyConsent}
                 className="w-full bg-primary hover:bg-primary/80 disabled:bg-primary/50 text-white font-bold py-4 px-8 rounded-lg transition-colors duration-200 text-lg"
               >
                 {isSubmitting ? '제출 중...' : '예약 제출하기'}
@@ -135,7 +168,7 @@ const ReservationSection: React.FC = () => {
             )}
 
             <p className="text-gray-400 text-sm mt-6">
-              * 입력하신 정보는 앱 출시 알림 목적으로만 사용되며, 개인정보보호정책에 따라 안전하게 관리됩니다.
+              * 입력하신 이메일은 앱 출시 알림 목적으로만 사용되며, 목적 달성 후 즉시 폐기됩니다.
             </p>
           </div>
         </div>
