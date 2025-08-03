@@ -10,19 +10,50 @@ interface Reservation {
 const AdminPanel: React.FC = () => {
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [isVisible, setIsVisible] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [password, setPassword] = useState('');
+  const [showPasswordInput, setShowPasswordInput] = useState(false);
+
+  // 관리자 비밀번호 (실제 운영에서는 환경변수나 서버에서 관리해야 함)
+  const ADMIN_PASSWORD = 'dave1219!';
 
   useEffect(() => {
     // 키보드 단축키로 관리자 패널 토글 (Ctrl + Alt + A)
     const handleKeyPress = (e: KeyboardEvent) => {
       if (e.ctrlKey && e.altKey && e.key === 'a') {
-        setIsVisible(!isVisible);
-        loadReservations();
+        if (isAuthenticated) {
+          setIsVisible(!isVisible);
+          if (!isVisible) {
+            loadReservations();
+          }
+        } else {
+          setShowPasswordInput(true);
+        }
       }
     };
 
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [isVisible]);
+  }, [isVisible, isAuthenticated]);
+
+  const handlePasswordSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (password === ADMIN_PASSWORD) {
+      setIsAuthenticated(true);
+      setIsVisible(true);
+      setShowPasswordInput(false);
+      setPassword('');
+      loadReservations();
+    } else {
+      alert('잘못된 비밀번호입니다.');
+      setPassword('');
+    }
+  };
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    setIsVisible(false);
+  };
 
   const loadReservations = () => {
     const data = localStorage.getItem('streamwith-reservations');
@@ -60,7 +91,55 @@ const AdminPanel: React.FC = () => {
     }
   };
 
-  if (!isVisible) {
+  // 비밀번호 입력 화면
+  if (showPasswordInput) {
+    return (
+      <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-lg p-8 max-w-md w-full">
+          <h2 className="text-2xl font-bold text-gray-800 mb-4">관리자 인증</h2>
+          <form onSubmit={handlePasswordSubmit}>
+            <div className="mb-4">
+              <label htmlFor="admin-password" className="block text-gray-700 text-sm font-medium mb-2">
+                관리자 비밀번호를 입력하세요
+              </label>
+              <input
+                type="password"
+                id="admin-password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="비밀번호 입력"
+                autoFocus
+              />
+            </div>
+            <div className="flex gap-4">
+              <button
+                type="submit"
+                className="flex-1 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+              >
+                확인
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowPasswordInput(false);
+                  setPassword('');
+                }}
+                className="flex-1 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+              >
+                취소
+              </button>
+            </div>
+          </form>
+          <p className="text-xs text-gray-500 mt-4">
+            * 관리자만 접근할 수 있습니다
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isVisible || !isAuthenticated) {
     return (
       <div className="fixed bottom-4 right-4 text-xs text-gray-500 bg-black/20 px-2 py-1 rounded">
         Ctrl + Alt + A 로 관리자 패널 열기
@@ -73,15 +152,28 @@ const AdminPanel: React.FC = () => {
       <div className="bg-white rounded-lg max-w-4xl w-full max-h-[80vh] overflow-hidden">
         <div className="p-6 border-b bg-gray-50">
           <div className="flex justify-between items-center">
-            <h2 className="text-2xl font-bold text-gray-800">예약 관리 패널</h2>
-            <button
-              onClick={() => setIsVisible(false)}
-              className="text-gray-500 hover:text-gray-700 text-2xl"
-            >
-              ×
-            </button>
+            <div>
+              <h2 className="text-2xl font-bold text-gray-800">예약 관리 패널</h2>
+              <p className="text-gray-600 mt-1">총 {reservations.length}개의 예약</p>
+            </div>
+            <div className="flex items-center gap-4">
+              <span className="text-sm text-green-600 bg-green-100 px-2 py-1 rounded">
+                ✓ 인증됨
+              </span>
+              <button
+                onClick={handleLogout}
+                className="text-sm bg-gray-500 text-white px-3 py-1 rounded hover:bg-gray-600"
+              >
+                로그아웃
+              </button>
+              <button
+                onClick={() => setIsVisible(false)}
+                className="text-gray-500 hover:text-gray-700 text-2xl"
+              >
+                ×
+              </button>
+            </div>
           </div>
-          <p className="text-gray-600 mt-2">총 {reservations.length}개의 예약</p>
         </div>
         
         <div className="p-6">
