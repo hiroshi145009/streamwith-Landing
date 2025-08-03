@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { getReservations, clearAllReservations, ReservationData } from '../../lib/supabase';
 
 interface Reservation {
-  id: string;
+  id: number;
   email: string;
   phone: string;
-  timestamp: string;
+  created_at: string;
 }
 
 const AdminPanel: React.FC = () => {
@@ -55,13 +56,13 @@ const AdminPanel: React.FC = () => {
     setIsVisible(false);
   };
 
-  const loadReservations = () => {
-    const data = localStorage.getItem('streamwith-reservations');
-    if (data) {
-      const parsed = JSON.parse(data);
-      setReservations(parsed.sort((a: Reservation, b: Reservation) => 
-        new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
-      ));
+  const loadReservations = async () => {
+    try {
+      const data = await getReservations();
+      setReservations(data || []);
+    } catch (error) {
+      console.error('예약 데이터 로드 오류:', error);
+      alert('데이터를 불러오는 중 오류가 발생했습니다.');
     }
   };
 
@@ -73,7 +74,7 @@ const AdminPanel: React.FC = () => {
         r.id,
         r.email,
         r.phone,
-        new Date(r.timestamp).toLocaleString('ko-KR')
+        new Date(r.created_at).toLocaleString('ko-KR')
       ].join(','))
     ].join('\n');
 
@@ -84,10 +85,16 @@ const AdminPanel: React.FC = () => {
     link.click();
   };
 
-  const clearAllData = () => {
+  const clearAllData = async () => {
     if (window.confirm('모든 예약 데이터를 삭제하시겠습니까?')) {
-      localStorage.removeItem('streamwith-reservations');
-      setReservations([]);
+      try {
+        await clearAllReservations();
+        setReservations([]);
+        alert('모든 데이터가 삭제되었습니다.');
+      } catch (error) {
+        console.error('데이터 삭제 오류:', error);
+        alert('데이터 삭제 중 오류가 발생했습니다.');
+      }
     }
   };
 
@@ -140,11 +147,7 @@ const AdminPanel: React.FC = () => {
   }
 
   if (!isVisible || !isAuthenticated) {
-    return (
-      <div className="fixed bottom-4 right-4 text-xs text-gray-500 bg-black/20 px-2 py-1 rounded">
-        Ctrl + Alt + A 로 관리자 패널 열기
-      </div>
-    );
+    return null; // 완전히 숨김
   }
 
   return (
@@ -219,7 +222,7 @@ const AdminPanel: React.FC = () => {
                       <td className="p-3 font-mono text-xs">{reservation.id}</td>
                       <td className="p-3">{reservation.email}</td>
                       <td className="p-3">{reservation.phone}</td>
-                      <td className="p-3">{new Date(reservation.timestamp).toLocaleString('ko-KR')}</td>
+                      <td className="p-3">{new Date(reservation.created_at).toLocaleString('ko-KR')}</td>
                     </tr>
                   ))}
                 </tbody>

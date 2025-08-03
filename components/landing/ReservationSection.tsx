@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { saveReservation } from '../../lib/supabase';
 
 interface ReservationData {
   email: string;
@@ -26,18 +27,11 @@ const ReservationSection: React.FC = () => {
     setIsSubmitting(true);
     
     try {
-      // 로컬 스토리지에 데이터 저장 (실제 서비스에서는 서버로 전송)
-      const existingData = localStorage.getItem('streamwith-reservations');
-      const reservations = existingData ? JSON.parse(existingData) : [];
-      
-      const newReservation = {
-        ...formData,
-        timestamp: new Date().toISOString(),
-        id: Date.now().toString()
-      };
-      
-      reservations.push(newReservation);
-      localStorage.setItem('streamwith-reservations', JSON.stringify(reservations));
+      // Supabase에 데이터 저장
+      await saveReservation({
+        email: formData.email,
+        phone: formData.phone
+      });
       
       setSubmitMessage('예약이 완료되었습니다! 앱 출시 시 특별 혜택을 받으실 수 있습니다.');
       setFormData({ email: '', phone: '' });
@@ -48,6 +42,7 @@ const ReservationSection: React.FC = () => {
       }, 3000);
       
     } catch (error) {
+      console.error('예약 저장 오류:', error);
       setSubmitMessage('예약 중 오류가 발생했습니다. 다시 시도해주세요.');
     } finally {
       setIsSubmitting(false);
