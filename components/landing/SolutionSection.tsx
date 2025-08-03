@@ -16,9 +16,9 @@ const AISequenceDemo: React.FC = () => {
     const [step, setStep] = useState(0);
 
     const imageSteps = [
-        './images/ai-matching-popup.png',
-        './images/ai-matching-loading.png',
-        './images/ai-matching-history.png'
+        '/images/ai-matching-popup.png',
+        '/images/ai-matching-loading.png',
+        '/images/ai-matching-history.png'
     ];
     
     const altTexts = [
@@ -91,14 +91,14 @@ const SolutionSection: React.FC = () => {
                  <div className="flex gap-2 sm:gap-4 w-full justify-center max-w-md sm:max-w-lg">
                     <div className="w-1/2 transform transition-transform duration-300 hover:scale-105">
                         <img 
-                            src="./images/partner-profile-detail.png" 
+                            src="/images/partner-profile-detail.png" 
                             alt="파트너 프로필 상세 화면 예시" 
                             className="rounded-2xl border border-gray-700 shadow-lg w-full h-full object-cover" 
                         />
                     </div>
                     <div className="w-1/2 transform transition-transform duration-300 hover:scale-105">
                         <img 
-                            src="./images/job-posting-detail.png" 
+                            src="/images/job-posting-detail.png" 
                             alt="구인 공고 상세 화면 예시" 
                             className="rounded-2xl border border-gray-700 shadow-lg w-full h-full object-cover" 
                         />
@@ -113,14 +113,14 @@ const SolutionSection: React.FC = () => {
                  <div className="flex gap-2 sm:gap-4 w-full justify-center max-w-md sm:max-w-lg">
                     <div className="w-1/2 transform transition-transform duration-300 hover:scale-105">
                         <img 
-                            src="./images/personal-chat.png" 
+                            src="/images/personal-chat.png" 
                             alt="채팅방 화면 예시" 
                             className="rounded-2xl border border-gray-700 shadow-lg w-full h-full object-cover" 
                         />
                     </div>
                     <div className="w-1/2 transform transition-transform duration-300 hover:scale-105">
                         <img 
-                            src="./images/partner-chat.png" 
+                            src="/images/partner-chat.png" 
                             alt="파트너 채팅방 화면 예시" 
                             className="rounded-2xl border border-gray-700 shadow-lg w-full h-full object-cover" 
                         />
