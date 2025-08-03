@@ -6,7 +6,8 @@ import ProblemSection from '../landing/ProblemSection';
 import SolutionSection from '../landing/SolutionSection';
 import HowItWorksSection from '../landing/HowItWorksSection';
 import ReviewsSection from '../landing/ReviewsSection';
-import FinalCTASection from '../landing/FinalCTASection';
+import ReservationSection from '../landing/ReservationSection';
+import AdminPanel from '../landing/AdminPanel';
 import Footer from '../landing/Footer';
 
 const LandingPage: React.FC = () => {
@@ -19,9 +20,10 @@ const LandingPage: React.FC = () => {
         <SolutionSection />
         <HowItWorksSection />
         <ReviewsSection />
-        <FinalCTASection />
+        <ReservationSection />
       </main>
       <Footer />
+      <AdminPanel />
     </div>
   );
 };

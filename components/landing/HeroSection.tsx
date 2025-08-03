@@ -2,6 +2,13 @@
 import React from 'react';
 
 const HeroSection: React.FC = () => {
+  const scrollToReservation = () => {
+    const reservationSection = document.getElementById('reservation-section');
+    if (reservationSection) {
+      reservationSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
       <div className="absolute inset-0 z-0">
@@ -22,19 +29,16 @@ const HeroSection: React.FC = () => {
           AI 매칭으로 단 5분 만에, 나와 딱 맞는 영상 편집자/매니저를 연결해 드립니다.
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-          <a
-            href="#cta"
-            className="w-full sm:w-auto bg-primary text-white font-bold py-3 px-8 rounded-full text-lg hover:bg-primary-dark transition-transform duration-300 ease-in-out transform hover:scale-105"
+          <button
+            onClick={scrollToReservation}
+            className="w-full sm:w-auto bg-primary text-white font-bold py-4 px-8 rounded-full text-lg hover:bg-primary-dark transition-transform duration-300 ease-in-out transform hover:scale-105"
           >
-            최고의 파트너 찾기
-          </a>
-          <a
-            href="#cta"
-            className="w-full sm:w-auto bg-secondary text-white font-bold py-3 px-8 rounded-full text-lg border-2 border-primary hover:bg-primary/20 transition-transform duration-300 ease-in-out transform hover:scale-105"
-          >
-            내 프로필 등록하기
-          </a>
+            앱 출시 예약하기 🚀
+          </button>
         </div>
+        <p className="text-sm text-primary mt-4 animate-pulse">
+          앱 출시 시 특별 혜택을 받아보세요!
+        </p>
       </div>
     </section>
   );
